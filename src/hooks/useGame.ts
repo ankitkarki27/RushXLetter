@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { GameStatus, GameState, GameSettings } from "@/types/game";
+import { useState, useCallback, useRef } from "react";
+import { GameState, GameSettings } from "@/types/game";
 import { getRandomPuzzle, shuffleLetters } from "@/data/puzzles";
 import { isValidWord, canMakeWord, getValidWordsForPuzzle } from "@/data/dictionary";
 
 const DEFAULT_SETTINGS: GameSettings = {
-  duration: 300, // 5 minutes
+  duration: 300,
 };
 
 function buildPuzzle(baseWord: string) {
@@ -12,6 +12,10 @@ function buildPuzzle(baseWord: string) {
     letters: shuffleLetters(baseWord),
     validWords: getValidWordsForPuzzle(baseWord),
   };
+}
+
+function calcPoints(wordLength: number): number {
+  return wordLength * 100;
 }
 
 export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
@@ -24,11 +28,25 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
     totalTime: settings.duration,
   });
 
+  const [highScore, setHighScore] = useState(() => {
+    if (typeof window !== "undefined") {
+      return parseInt(localStorage.getItem("letterrush-highscore") || "0");
+    }
+    return 0;
+  });
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const clearTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
   };
+
+  const updateHighScore = useCallback((finalScore: number) => {
+    if (finalScore > highScore) {
+      setHighScore(finalScore);
+      localStorage.setItem("letterrush-highscore", String(finalScore));
+    }
+  }, [highScore]);
 
   const startTimer = useCallback(() => {
     clearTimer();
@@ -36,16 +54,16 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
       setState((prev) => {
         if (prev.timeLeft <= 1) {
           clearTimer();
+          updateHighScore(prev.score);
           return { ...prev, timeLeft: 0, status: "finished" };
         }
         return { ...prev, timeLeft: prev.timeLeft - 1 };
       });
     }, 1000);
-  }, []);
+  }, [updateHighScore]);
 
   const startGame = useCallback(() => {
-    const baseWord = getRandomPuzzle();
-    const puzzle = buildPuzzle(baseWord);
+    const puzzle = buildPuzzle(getRandomPuzzle());
     setState({
       status: "playing",
       puzzle,
@@ -58,8 +76,7 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
   }, [settings.duration, startTimer]);
 
   const nextRound = useCallback(() => {
-    const baseWord = getRandomPuzzle();
-    const puzzle = buildPuzzle(baseWord);
+    const puzzle = buildPuzzle(getRandomPuzzle());
     setState({
       status: "playing",
       puzzle,
@@ -78,20 +95,17 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
       if (w.length < 3) {
         return { success: false, message: "Too short! Minimum 3 letters." };
       }
-
       if (!canMakeWord(w, state.puzzle.letters)) {
         return { success: false, message: "Can't make that from these letters!" };
       }
-
       if (!isValidWord(w)) {
         return { success: false, message: "Not a valid English word." };
       }
-
       if (state.foundWords.includes(w)) {
         return { success: false, message: "Already found that one!" };
       }
 
-      const points = w.length;
+      const points = calcPoints(w.length);
 
       setState((prev) => ({
         ...prev,
@@ -114,15 +128,21 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
     }));
   }, []);
 
-  useEffect(() => {
-    return () => clearTimer();
-  }, []);
+  const giveUp = useCallback(() => {
+    clearTimer();
+    setState((prev) => {
+      updateHighScore(prev.score);
+      return { ...prev, status: "finished" };
+    });
+  }, [updateHighScore]);
 
   return {
     state,
+    highScore,
     startGame,
     nextRound,
     submitWord,
     shuffleTiles,
+    giveUp,
   };
 }
