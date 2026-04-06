@@ -4,7 +4,7 @@ import { getRandomPuzzle, shuffleLetters } from "@/data/puzzles";
 import { isValidWord, canMakeWord, getValidWordsForPuzzle } from "@/data/dictionary";
 
 const DEFAULT_SETTINGS: GameSettings = {
-  duration: 300,
+  duration: 180,
 };
 
 function buildPuzzle(baseWord: string) {
@@ -36,6 +36,7 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
   });
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const isUnlimited = settings.duration === 0;
 
   const clearTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -52,6 +53,11 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
     clearTimer();
     timerRef.current = setInterval(() => {
       setState((prev) => {
+        // unlimited mode — count up, never finish automatically
+        if (prev.totalTime === 0) {
+          return { ...prev, timeLeft: prev.timeLeft + 1 };
+        }
+        // normal countdown
         if (prev.timeLeft <= 1) {
           clearTimer();
           updateHighScore(prev.score);
@@ -69,11 +75,11 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
       puzzle,
       foundWords: [],
       score: 0,
-      timeLeft: settings.duration,
+      timeLeft: isUnlimited ? 0 : settings.duration,
       totalTime: settings.duration,
     });
     startTimer();
-  }, [settings.duration, startTimer]);
+  }, [settings.duration, isUnlimited, startTimer]);
 
   const nextRound = useCallback(() => {
     const puzzle = buildPuzzle(getRandomPuzzle());
@@ -82,11 +88,11 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
       puzzle,
       foundWords: [],
       score: 0,
-      timeLeft: settings.duration,
+      timeLeft: isUnlimited ? 0 : settings.duration,
       totalTime: settings.duration,
     });
     startTimer();
-  }, [settings.duration, startTimer]);
+  }, [settings.duration, isUnlimited, startTimer]);
 
   const submitWord = useCallback(
     (word: string): { success: boolean; message: string } => {
@@ -139,6 +145,7 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
   return {
     state,
     highScore,
+    isUnlimited,
     startGame,
     nextRound,
     submitWord,

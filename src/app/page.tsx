@@ -14,16 +14,17 @@ import { GameSettings } from "@/types/game";
 import Navbar from "@/components/game/Navbar";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/game/Footer";
+import HowToPlay from "@/components/game/HowToPlay";
 
 
 
 export default function Home() {
-  const [settings, setSettings] = useState<GameSettings>({ duration: 300 });
+  const [settings, setSettings] = useState<GameSettings>({ duration: 180 });
   const [showSettings, setShowSettings] = useState(false);
   const [showHowTo, setShowHowTo] = useState(false);
   const [showGiveUp, setShowGiveUp] = useState(false);
 
-  const { state, highScore, startGame, nextRound, submitWord, shuffleTiles, giveUp } =
+  const { state, highScore, isUnlimited, startGame, nextRound, submitWord, shuffleTiles, giveUp } =
     useGame(settings);
 
   const missedWords = state.puzzle.validWords.filter(
@@ -40,20 +41,17 @@ export default function Home() {
       />
 
       {showHowTo && (
-        <div className="w-full mb-6 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white/50 leading-relaxed">
-          Find as many real English words as possible using only the given letters.
-          Minimum 3 letters per word. Longer words earn more points.
-          Hit shuffle to rearrange, or give up to see results early.
-        </div>
+        <HowToPlay onClose={() => setShowHowTo(false)} />
       )}
 
       {/* Idle screen */}
       {state.status === "idle" && (
         <div className="flex flex-col items-center gap-10 w-full mt-10">
           <div className="text-center">
-            <p className="text-white/50 text-base leading-relaxed max-w-sm">
+            <p className="text-white/50 text-base leading-relaxed max-w-md">
               Find as many words as possible using only the given letters.
-              Minimum 3 letters. Longer words = more points.
+              Minimum 3 letters.
+              Longer words = more points.
             </p>
           </div>
           {/* <LetterTiles
@@ -64,8 +62,8 @@ export default function Home() {
           <Button
             onClick={startGame}
             size="lg"
-            // variant="default"
-            >
+          // variant="default"
+          >
             Start Game
           </Button>
         </div>
@@ -81,6 +79,7 @@ export default function Home() {
             found={state.foundWords.length}
             highScore={highScore}
             timeLeft={state.timeLeft}
+            isUnlimited={isUnlimited}
           />
 
           {/* Found words */}
@@ -129,7 +128,7 @@ export default function Home() {
         />
       )}
 
-<Footer />
+      <Footer />
     </main>
   );
 }

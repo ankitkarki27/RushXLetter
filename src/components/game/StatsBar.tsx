@@ -7,12 +7,13 @@ interface StatsBarProps {
     found: number;
     highScore: number;
     timeLeft: number;
+    isUnlimited: boolean;
 }
 
-const StatsBar = ({ score, found, highScore, timeLeft }: StatsBarProps) => {
+const StatsBar = ({ score, found, highScore, timeLeft, isUnlimited }: StatsBarProps) => {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
-    const isLow = timeLeft <= 30;
+    const isLow = !isUnlimited && timeLeft <= 30;
 
     return (
         <div className="flex items-center justify-between w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3">
@@ -37,7 +38,7 @@ const StatsBar = ({ score, found, highScore, timeLeft }: StatsBarProps) => {
 
             {/* timer */}
             <span className={`text-sm font-semibold tabular-nums ${isLow ? "text-red-400" : "text-white"}`}>
-                {m}:{s < 10 ? "0" : ""}{s}
+                {isUnlimited ? "∞" : `${m}:${s < 10 ? "0" : ""}${s}`}
             </span>
 
         </div>
