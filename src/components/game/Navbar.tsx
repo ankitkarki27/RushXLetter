@@ -12,7 +12,7 @@ const Navbar = ({ onHowTo, onSettings }: NavbarProps) => {
   return (
     <div className="flex items-center justify-between w-full mb-8">
         <h1 className="text-white font-semibold text-xl tracking-tight cursor-pointer">
-          RushLetter
+          wordzo
         </h1>
 
 

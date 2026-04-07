@@ -8,7 +8,7 @@ const Footer = () => {
 
       {/* App Name */}
       <p className="text-lg font-semibold text-white mb-4">
-        RushLetter
+        wordzo
       </p>
 
       {/* Creator */}
@@ -52,7 +52,7 @@ const Footer = () => {
 
       {/* Copyright */}
       <p className="text-xs text-white/20">
-        © {new Date().getFullYear()} RushLetter
+        © {new Date().getFullYear()} wordzo
       </p>
     </footer>
   );

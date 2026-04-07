@@ -9,7 +9,7 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LetterRush — Word Scramble Game",
+  title: "wordzo – Beat the Clock. Build Words.",
   description: "Find as many words as possible from scrambled letters before time runs out!",
 };
 
