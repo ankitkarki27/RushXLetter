@@ -1,7 +1,11 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { GameState, GameSettings } from "@/types/game";
 import { getRandomPuzzle, shuffleLetters } from "@/data/puzzles";
-import { isValidWord, canMakeWord, getValidWordsForPuzzle } from "@/data/dictionary";
+import {
+  isValidWord,
+  canMakeWord,
+  getValidWordsForPuzzle,
+} from "@/data/dictionary";
 
 const DEFAULT_SETTINGS: GameSettings = {
   duration: 180,
@@ -36,40 +40,76 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
   });
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const isUnlimited = settings.duration === 0;
 
   const clearTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
-  const updateHighScore = useCallback((finalScore: number) => {
-    if (finalScore > highScore) {
-      setHighScore(finalScore);
-      localStorage.setItem("letterrush-highscore", String(finalScore));
-    }
-  }, [highScore]);
+  const updateHighScore = useCallback(
+    (finalScore: number) => {
+      if (finalScore > highScore) {
+        setHighScore(finalScore);
+        localStorage.setItem("letterrush-highscore", String(finalScore));
+      }
+    },
+    [highScore]
+  );
 
   const startTimer = useCallback(() => {
     clearTimer();
+
     timerRef.current = setInterval(() => {
       setState((prev) => {
-        // unlimited mode — count up, never finish automatically
+        // unlimited mode (count up)
         if (prev.totalTime === 0) {
           return { ...prev, timeLeft: prev.timeLeft + 1 };
         }
-        // normal countdown
+
+        // countdown mode
         if (prev.timeLeft <= 1) {
           clearTimer();
           updateHighScore(prev.score);
           return { ...prev, timeLeft: 0, status: "finished" };
         }
+
         return { ...prev, timeLeft: prev.timeLeft - 1 };
       });
     }, 1000);
   }, [updateHighScore]);
 
+  // ✅ FIX: react to settings changes properly
+  useEffect(() => {
+    const puzzle = buildPuzzle(getRandomPuzzle());
+
+    clearTimer();
+
+    setState((prev) => {
+      const isPlaying = prev.status === "playing";
+
+      if (isPlaying) {
+        // restart timer if already playing
+        startTimer();
+      }
+
+      return {
+        status: isPlaying ? "playing" : "idle",
+        puzzle,
+        foundWords: [],
+        score: 0,
+        timeLeft: settings.duration,
+        totalTime: settings.duration,
+      };
+    });
+  }, [settings.duration, startTimer]);
+
   const startGame = useCallback(() => {
     const puzzle = buildPuzzle(getRandomPuzzle());
+
     setState({
       status: "playing",
       puzzle,
@@ -78,11 +118,13 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
       timeLeft: isUnlimited ? 0 : settings.duration,
       totalTime: settings.duration,
     });
+
     startTimer();
   }, [settings.duration, isUnlimited, startTimer]);
 
   const nextRound = useCallback(() => {
     const puzzle = buildPuzzle(getRandomPuzzle());
+
     setState({
       status: "playing",
       puzzle,
@@ -91,6 +133,7 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
       timeLeft: isUnlimited ? 0 : settings.duration,
       totalTime: settings.duration,
     });
+
     startTimer();
   }, [settings.duration, isUnlimited, startTimer]);
 
@@ -101,12 +144,15 @@ export function useGame(settings: GameSettings = DEFAULT_SETTINGS) {
       if (w.length < 3) {
         return { success: false, message: "Too short! Minimum 3 letters." };
       }
+
       if (!canMakeWord(w, state.puzzle.letters)) {
         return { success: false, message: "Can't make that from these letters!" };
       }
+
       if (!isValidWord(w)) {
         return { success: false, message: "Not a valid English word." };
       }
+
       if (state.foundWords.includes(w)) {
         return { success: false, message: "Already found that one!" };
       }

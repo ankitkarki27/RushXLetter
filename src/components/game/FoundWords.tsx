@@ -10,7 +10,7 @@ const FoundWords = ({ words }: FoundWordsProps) => {
   if (words.length === 0) {
     return (
       <p className="text-white/20 text-sm text-center">
-        No words found yet...
+       Start forming words 
       </p>
     );
   }
