@@ -9,7 +9,7 @@ interface FoundWordsProps {
 const FoundWords = ({ words }: FoundWordsProps) => {
   if (words.length === 0) {
     return (
-      <p className="text-white/20 text-sm text-center">
+      <p className="text-white/80 text-sm text-center">
        Start forming words 
       </p>
     );
