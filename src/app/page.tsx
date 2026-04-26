@@ -93,7 +93,7 @@ export default function Home() {
 
       {state.status === "idle" && (
         <div className="flex flex-col items-center justify-center flex-1 w-full mt-16 text-center">
-          {/* Title */}
+
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
 
           </h1>
@@ -103,8 +103,6 @@ export default function Home() {
             <br />
             Train your brain, beat your score, and improve your speed.
           </p>
-
-          {/* CTA Buttons */}
           <div className="flex flex-col gap-3 w-full max-w-xs">
             <Button
               onClick={startGame}
@@ -117,7 +115,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Playing screen */}
       {state.status === "playing" && (
         <div className="flex flex-col gap-6 w-full">
           <StatsBar
@@ -164,7 +161,6 @@ export default function Home() {
         />
       )}
 
-      {/* Give up modal */}
       {showGiveUp && (
         <GiveUpModal
           onConfirm={() => {
@@ -175,7 +171,6 @@ export default function Home() {
         />
       )}
 
-      {/* Settings modal */}
       {showSettings && (
         <Settings
           settings={settings}

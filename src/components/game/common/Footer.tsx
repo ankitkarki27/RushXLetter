@@ -15,7 +15,7 @@ const Footer = () => {
       <p className="text-sm text-white/40 mb-2">
         Made by{" "}
         <a
-          href="https://www.karkiankit.com.np/"
+          href="https://www.meenfa.tech/"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-white underline-offset-4 hover:underline transition"
@@ -33,7 +33,7 @@ const Footer = () => {
           Email
         </a>
         <a
-          href="https://www.linkedin.com/in/ankitkarki27"
+          href="https://www.linkedin.com/in/meenfa"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-white underline-offset-4 hover:underline transition"
@@ -41,12 +41,20 @@ const Footer = () => {
           LinkedIn
         </a>
         <a
-          href="https://github.com/ankitkarki27"
+          href="https://github.com/meenfa"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-white underline-offset-4 hover:underline transition"
         >
           GitHub
+        </a>
+         <a
+          href="https://x.com/meenfax"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-white underline-offset-4 hover:underline transition"
+        >
+          X/Twitter
         </a>
       </p>
 
