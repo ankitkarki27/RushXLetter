@@ -8,7 +8,7 @@ interface SelectedWordProps {
   maxSlots?: number;
 }
 
-const SelectedWord = ({ word, maxSlots = 10 }: SelectedWordProps) => {
+const SelectedWord = ({ word, maxSlots = 8 }: SelectedWordProps) => {
   const letters = word.split("");
 
   return (

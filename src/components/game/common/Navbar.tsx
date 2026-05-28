@@ -1,5 +1,6 @@
 "use client";
 
+import { Settings } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -11,9 +12,9 @@ interface NavbarProps {
 const Navbar = ({ onHowTo, onSettings }: NavbarProps) => {
   return (
     <div className="flex items-center justify-between w-full mb-8">
-        <h1 className="text-white font-semibold text-xl tracking-tight ">
-          wordzo
-        </h1>
+      <h1 className="text-white font-semibold text-xl tracking-tight ">
+        wordzo
+      </h1>
 
 
       <div className="flex items-center gap-4">
@@ -27,7 +28,7 @@ const Navbar = ({ onHowTo, onSettings }: NavbarProps) => {
           onClick={onSettings}
           className="text-white/30 hover:text-white/60 transition text-sm cursor-pointer"
         >
-          settings
+          <Settings />
         </button>
       </div>
     </div >
